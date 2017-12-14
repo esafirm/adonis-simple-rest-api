@@ -32,4 +32,6 @@ Route.group(() => {
   Route.get('books', 'BookController.index');
   Route.get('books/:id', 'BookController.show');
   Route.post('books', 'BookController.store');
+  Route.post('books/:id', 'BookController.update');
+  Route.delete('books/:id', 'BookController.delete');
 }).prefix('api/v1');
