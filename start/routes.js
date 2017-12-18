@@ -14,10 +14,54 @@
 */
 
 const Route = use('Route');
+const Car = use('App/Models/Car');
 
 Route.get('/', ({ request }) => {
   return { greeting: 'Hello world in JSON' };
 });
+
+Route.group(() => {
+  Route.get('/cars', async () => {
+    return await Car.all();
+  });
+
+  Route.post('/cars', async ({ request }) => {
+    const parameter = request.only(['name', 'type']);
+
+    const newCar = new Car();
+    newCar.name = parameter.name;
+    newCar.type = parameter.type;
+
+    await newCar.save();
+
+    return newCar;
+  });
+
+  Route.post('/cars/:id', async ({ params, request }) => {
+    const parameter = request.only(['name', 'type']);
+
+    const car = await Car.find(params.id);
+    if (!car) {
+      return response.status(404).json({ message: 'Car not found' });
+    }
+
+    car.name = parameter.name;
+    car.type = parameter.type;
+
+    await car.save();
+
+    return car;
+  });
+
+  Route.delete('/cars/:id', async ({ params, request, response }) => {
+    const car = await Car.find(params.id);
+    if (!car) {
+      return response.status(404).json({ message: 'Car not found' });
+    }
+    await car.delete();
+    return response.status(200).json({ message: 'Car deleted!' });
+  });
+}).prefix('/v1');
 
 Route.group(() => {
   Route.get('/hello', () => ({
